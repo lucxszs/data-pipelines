@@ -140,9 +140,8 @@ Estes comandos são iguais no Windows e no Linux:
 ```powershell
 pip install ruff==0.17.4 sqlfluff==4.5.0
 ruff check .
-Push-Location dags\dbt\data_warehouse
+cd dags\dbt\data_warehouse
 sqlfluff lint models tests
-Pop-Location
 ```
 
 **Linux:**
@@ -150,7 +149,8 @@ Pop-Location
 ```bash
 pip install ruff==0.17.4 sqlfluff==4.5.0
 ruff check .
-(cd dags/dbt/data_warehouse && sqlfluff lint models tests)
+cd dags/dbt/data_warehouse
+sqlfluff lint models tests
 ```
 
 ## Observabilidade
