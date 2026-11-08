@@ -9,7 +9,7 @@ with source as (
 
     select * from {{ source('bronze', 'bacen_ptax') }}
     {% if is_incremental() %}
-        where loaded_at > (select coalesce(max(loaded_at), '1900-01-01') from {{ this }})
+        where loaded_at > (select coalesce(max(atual.loaded_at), '1900-01-01') from {{ this }} as atual)
     {% endif %}
 
 )

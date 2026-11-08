@@ -2,6 +2,8 @@
 dialect = postgres
 templater = jinja
 max_line_length = 120
+# Column order follows meaning, not expression type.
+exclude_rules = structure.column_order
 
 [sqlfluff:templater:jinja]
 apply_dbt_builtins = True

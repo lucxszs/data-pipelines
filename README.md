@@ -138,7 +138,7 @@ Estes comandos são iguais no Windows e no Linux:
 **Windows (PowerShell):**
 
 ```powershell
-pip install -r requirements-dev.txt
+pip install ruff==0.17.4 sqlfluff==4.5.0
 ruff check .
 Push-Location dags\dbt\data_warehouse
 sqlfluff lint models tests
@@ -148,7 +148,7 @@ Pop-Location
 **Linux:**
 
 ```bash
-pip install -r requirements-dev.txt
+pip install ruff==0.17.4 sqlfluff==4.5.0
 ruff check .
 (cd dags/dbt/data_warehouse && sqlfluff lint models tests)
 ```
