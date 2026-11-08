@@ -1,0 +1,8 @@
+# Optional, only for the Telegram alerts: copy to airflow_settings.yaml (gitignored).
+# The postgres_dwh connection already comes from docker-compose.override.yml.
+airflow:
+  connections: []
+  pools: []
+  variables: []
+    # - variable_name: telegram
+    #   variable_value: '{"bot_token": "123456789:AA...", "chat_id": "123456789"}'

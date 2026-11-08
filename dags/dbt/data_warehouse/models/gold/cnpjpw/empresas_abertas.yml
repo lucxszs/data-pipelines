@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: empresas_abertas
+    description: "Uma linha por empresa aberta, sem telefone, e-mail ou nome de sócio: a gold analisa o mercado, não pessoas."
+    columns:
+      - name: cnpj
+        data_tests:
+          - unique
+          - not_null
+      - name: qtd_socios
+        data_tests:
+          - not_null

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: pep
+    description: "PEPs limpos e tipados, uma linha por vínculo pessoa x função x órgão."
+    columns:
+      - name: nome_pep
+        data_tests:
+          - not_null
+      - name: nome_orgao
+        data_tests:
+          - not_null

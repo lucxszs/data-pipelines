@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: cnpjpw_empresas
+        description: JSON cru de cada empresa recém-aberta na API cnpj.pw.
+        columns:
+          - name: cnpj
+            data_tests:
+              - not_null
+              - unique

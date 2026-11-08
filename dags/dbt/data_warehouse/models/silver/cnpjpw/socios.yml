@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: socios
+    description: "Sócios das empresas recém-abertas, uma linha por sócio. Documento e data de entrada costumam vir nulos na fonte."
+    columns:
+      - name: cnpj
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('empresas')
+                field: cnpj
+      - name: nome_socio
+        data_tests:
+          - not_null

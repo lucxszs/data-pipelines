@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: aberturas_por_atividade
+    description: "Empresas abertas por dia, UF e atividade econômica."
+    columns:
+      - name: qtd_empresas
+        data_tests:
+          - not_null

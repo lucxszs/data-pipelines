@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: cotacao_dolar
+    description: "Cotação do dólar por dia, com spread e variação em relação ao dia anterior."
+    columns:
+      - name: data_cotacao
+        data_tests:
+          - unique
+          - not_null
+      - name: spread
+        data_tests:
+          - not_null

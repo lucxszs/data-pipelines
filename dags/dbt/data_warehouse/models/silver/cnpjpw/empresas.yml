@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: empresas
+    description: "Empresas recém-abertas tipadas, uma linha por CNPJ."
+    columns:
+      - name: cnpj
+        data_tests:
+          - unique
+          - not_null
+      - name: data_abertura
+        data_tests:
+          - not_null
+      - name: uf
+        data_tests:
+          - not_null

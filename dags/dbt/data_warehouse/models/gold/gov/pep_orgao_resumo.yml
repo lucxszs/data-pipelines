@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: pep_orgao_resumo
+    description: "Ranking de órgãos públicos pela quantidade de vínculos de PEP."
+    columns:
+      - name: nome_orgao
+        description: "Chave do modelo, uma linha por órgão."
+        data_tests:
+          - unique
+          - not_null
+      - name: total_vinculos
+        data_tests:
+          - not_null

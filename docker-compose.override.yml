@@ -1,0 +1,40 @@
+services:
+  # on-failure, not the Astro default: on Windows/WSL2 a container auto-started by Docker
+  # Desktop loses its published port. "no" would not work either, because these services
+  # can exit while db-migration is still running and must be able to restart.
+  api-server:
+    restart: on-failure
+    environment:
+      AIRFLOW_CONN_POSTGRES_DWH: postgres://postgres:postgres@postgres-dwh:5432/dwh
+  scheduler:
+    restart: on-failure
+    environment:
+      AIRFLOW_CONN_POSTGRES_DWH: postgres://postgres:postgres@postgres-dwh:5432/dwh
+  dag-processor:
+    restart: on-failure
+    environment:
+      AIRFLOW_CONN_POSTGRES_DWH: postgres://postgres:postgres@postgres-dwh:5432/dwh
+  triggerer:
+    restart: on-failure
+    environment:
+      AIRFLOW_CONN_POSTGRES_DWH: postgres://postgres:postgres@postgres-dwh:5432/dwh
+  postgres:
+    restart: "no"
+
+  # Project data, kept apart from Airflow's metadata database.
+  postgres-dwh:
+    image: postgres:15
+    restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dwh
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-dwh-data:/var/lib/postgresql/data
+    networks:
+      - airflow
+
+volumes:
+  postgres-dwh-data:

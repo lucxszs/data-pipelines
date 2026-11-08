@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: bacen_ptax
+        description: JSON cru de cada cotação do dólar na API PTAX do Banco Central.
+        columns:
+          - name: data_hora_cotacao
+            data_tests:
+              - not_null
+              - unique

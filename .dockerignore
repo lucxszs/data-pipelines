@@ -1,0 +1,15 @@
+astro
+.git
+.github
+.env
+airflow_settings.yaml
+docs/
+logs/
+.venv
+.ruff_cache/
+airflow.db
+airflow.cfg
+include/staging/
+dags/dbt/data_warehouse/target/
+dags/dbt/data_warehouse/logs/
+**/__pycache__/

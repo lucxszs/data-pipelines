@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: ptax
+    description: "Cotação do dólar tipada, uma linha por dia."
+    columns:
+      - name: data_cotacao
+        data_tests:
+          - unique
+          - not_null
+      - name: compra
+        data_tests:
+          - not_null
+      - name: venda
+        data_tests:
+          - not_null

@@ -1,0 +1,40 @@
+name: "data_warehouse"
+version: "1.0.0"
+config-version: 2
+
+profile: "data_warehouse"
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# <layer>/<source>: the layer sets the schema, the source sets the tag each DAG selects.
+# Models are tables by default; those that grow over time opt into incremental.
+models:
+  data_warehouse:
+    +materialized: table
+    +on_schema_change: fail
+
+    silver:
+      +schema: silver
+      +tags: ["silver"]
+      bacen:
+        +tags: ["bacen"]
+      gov:
+        +tags: ["gov"]
+      cnpjpw:
+        +tags: ["cnpjpw"]
+
+    gold:
+      +schema: gold
+      +tags: ["gold"]
+      bacen:
+        +tags: ["bacen"]
+      gov:
+        +tags: ["gov"]
+      cnpjpw:
+        +tags: ["cnpjpw"]

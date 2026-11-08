@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lint tools
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint Python
+        run: ruff check .
+
+  sqlfluff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lint tools
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint SQL
+        working-directory: dags/dbt/data_warehouse
+        run: sqlfluff lint models tests
+
+  dbt:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dwh
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      DBT_HOST: localhost
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt
+        run: pip install dbt-core==1.11.16 dbt-postgres==1.11.0
+
+      - name: Load fictitious bronze
+        run: psql -h localhost -U postgres -d dwh -v ON_ERROR_STOP=1 -f .github/ci/bronze_fixture.sql
+
+      - name: dbt build (first run)
+        working-directory: dags/dbt/data_warehouse
+        run: dbt build --profiles-dir .
+
+      # The second run is the one that exercises the is_incremental() branch.
+      - name: dbt build (incremental run)
+        working-directory: dags/dbt/data_warehouse
+        run: dbt build --profiles-dir .
