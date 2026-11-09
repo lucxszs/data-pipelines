@@ -48,7 +48,6 @@ Uma única convenção liga cada fonte do início ao fim:
 - **Testes como portão:** um teste que falha impede a camada seguinte de rodar.
 - **Lógica testada antes do dado:** testes unitários validam as regras dos modelos com dados fictícios, só no CI.
 - **Atraso vira alerta:** cada tabela bronze tem um prazo máximo sem carga.
-- **Sem dados no repositório:** tudo vem das fontes quando as DAGs rodam.
 
 ### Como adicionar uma fonte
 
