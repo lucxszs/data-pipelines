@@ -3,6 +3,9 @@
 Toda DAG envia uma mensagem no Telegram quando uma task falha depois de esgotar os
 retries. É opcional: sem a Variable abaixo, o alerta é ignorado e o projeto roda normalmente.
 
+A verificação de freshness usa o mesmo alerta. Se uma tabela bronze passar do prazo, a mensagem
+também chega aqui, inclusive quando a DAG de carga está pausada e não falhou.
+
 ## 1. Criar o bot
 
 1. No Telegram, abra uma conversa com **@BotFather**.

@@ -24,3 +24,4 @@ dags/dbt/data_warehouse/.user.yml
 dbt_venv/
 
 include/staging/
+include/dbt_docs/

@@ -14,3 +14,19 @@ models:
       - name: nome_socio
         data_tests:
           - not_null
+
+unit_tests:
+  - name: socios_expands_array_and_ignores_company_without_partners
+    model: socios
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: source('bronze', 'cnpjpw_empresas')
+        rows:
+          - {cnpj: "11111111000191", payload: '{"socios": null}'}
+          - {cnpj: "22222222000180", payload: '{"socios": [{"nome": "SOCIO A"}, {"nome": "SOCIO B"}]}'}
+    expect:
+      rows:
+        - {cnpj: "22222222000180", nome_socio: "SOCIO A"}
+        - {cnpj: "22222222000180", nome_socio: "SOCIO B"}

@@ -39,19 +39,22 @@ Uma única convenção liga cada fonte do início ao fim:
 | Declaração da bronze | `models/sources/{fonte}_{base}.yml` |
 | Modelos dbt | `models/{silver,gold}/{fonte}/`, com um `.sql` e um `.yml` por modelo |
 | Seleção no Cosmos | `tag:{fonte}` |
+| DAG de manutenção | `airflow_{ação}` ou `dbt_{ação}`, fora do fluxo de dados |
 
 **Decisões de projeto:**
 
 - **Cargas idempotentes:** reexecutar uma DAG não duplica dados.
 - **Uma task por modelo:** uma falha é reprocessada sozinha, com log próprio.
 - **Testes como portão:** um teste que falha impede a camada seguinte de rodar.
+- **Lógica testada antes do dado:** testes unitários validam as regras dos modelos com dados fictícios, só no CI.
+- **Atraso vira alerta:** cada tabela bronze tem um prazo máximo sem carga.
 - **Sem dados no repositório:** tudo vem das fontes quando as DAGs rodam.
 
 ### Como adicionar uma fonte
 
 1. Crie `dags/scripts/{fonte}/` com o cliente, as constantes e o job de `extract` e `load_bronze`.
-2. Declare a tabela bronze em `models/sources/{fonte}_{base}.yml`.
-3. Crie os modelos em `models/silver/{fonte}/` e `models/gold/{fonte}/`, cada um com seu `.yml` de testes.
+2. Declare a tabela bronze em `models/sources/{fonte}_{base}.yml`, com o prazo de freshness.
+3. Crie os modelos em `models/silver/{fonte}/` e `models/gold/{fonte}/`, cada um com seu `.yml` de testes. Inclua testes unitários nos modelos com regra de negócio.
 4. Adicione a tag da fonte em `dbt_project.yml`.
 5. Crie `dags/{fonte}_load_{base}.py` copiando uma DAG existente e trocando a tag.
 
@@ -80,11 +83,12 @@ A cada push e pull request, o [GitHub Actions](.github/workflows/ci.yml) roda tr
 
 - **ruff:** lint do código Python
 - **sqlfluff:** lint dos modelos SQL
-- **dbt:** `dbt build` duas vezes em um Postgres descartável, com dados fictícios, para testar a carga inicial e a incremental
+- **dbt:** em um Postgres descartável, com dados fictícios, roda `dbt build` duas vezes para testar a carga inicial e a incremental. A segunda execução inclui os testes unitários, e o job termina validando o `dbt source freshness`
 
 **Deploy:** a unidade de deploy é a imagem Docker, com todas as versões fixadas. Hoje o
 projeto roda localmente com o Astro CLI e não tem um ambiente de produção configurado.
-Para publicar no Astro, o caminho é criar um Deployment e rodar `astro deploy`.
+Para publicar no Astro, o caminho é criar um Deployment e rodar `astro deploy`. As docs do dbt
+usam uma pasta compartilhada entre os containers, então lá precisariam ir para um bucket.
 
 ## Como rodar
 
@@ -117,6 +121,7 @@ astro dev start
 | O quê | Onde |
 |---|---|
 | UI do Airflow | http://localhost:8080 |
+| Docs e linhagem do dbt | Menu **Browse > dbt Docs** da UI, depois da primeira execução da DAG de documentação |
 | Banco de dados | `127.0.0.1:5433`, banco `dwh`, usuário e senha `postgres` |
 
 A connection `postgres_dwh` já vem configurada, e as tabelas são criadas pelas próprias DAGs.
@@ -168,11 +173,17 @@ Todos os scripts registram logs no mesmo formato:
 Quando uma task falha depois dos retries, o projeto também pode
 [avisar no Telegram](docs/telegram-alerts.md). Esse alerta é opcional.
 
+Uma falha só avisa quando a DAG roda. Para cobrir o caso de uma carga que parou, uma DAG de
+manutenção confere todo dia se cada tabela bronze foi carregada dentro do prazo definido no
+seu `.yml` e falha quando alguma está atrasada. Ela também falha enquanto alguma tabela
+bronze ainda não existir, então rode as DAGs de carga uma vez antes de ativá-la.
+
 ## Estrutura
 
 ```
 dags/
-├─ {fonte}_load_{base}.py     # definição das DAGs
+├─ {fonte}_load_{base}.py     # DAGs de dados
+├─ {airflow,dbt}_{ação}.py    # DAGs de manutenção
 ├─ dbt/data_warehouse/        # projeto dbt
 │  ├─ models/
 │  │  ├─ sources/             # um yml por tabela bronze
@@ -182,8 +193,9 @@ dags/
 │  └─ tests/
 ├─ domain/                    # defaults das DAGs, connections e config do Cosmos
 ├─ scripts/{fonte}/           # client, domain e job de cada fonte
-└─ utils/                     # helpers de Postgres, Playwright, logs e Telegram
+└─ utils/                     # helpers de Postgres, Playwright, logs, Telegram e docs do dbt
+plugins/                      # abre as docs do dbt dentro da UI do Airflow
 docs/                         # diagramas e guia de alertas
-include/                      # arquivos temporários das execuções (fora do Git)
+include/                      # arquivos temporários e docs do dbt gerados nas execuções (fora do Git)
 .github/                      # CI e dados fictícios para os testes
 ```

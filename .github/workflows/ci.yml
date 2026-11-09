@@ -66,11 +66,16 @@ jobs:
       - name: Load fictitious bronze
         run: psql -h localhost -U postgres -d dwh -v ON_ERROR_STOP=1 -f .github/ci/bronze_fixture.sql
 
+      # Unit tests of incremental models need the tables to exist, so they wait for the second run.
       - name: dbt build (first run)
+        working-directory: dags/dbt/data_warehouse
+        run: dbt build --profiles-dir . --exclude-resource-type unit_test
+
+      # The second run is the one that exercises the is_incremental() branch.
+      - name: dbt build (incremental run, with unit tests)
         working-directory: dags/dbt/data_warehouse
         run: dbt build --profiles-dir .
 
-      # The second run is the one that exercises the is_incremental() branch.
-      - name: dbt build (incremental run)
+      - name: dbt source freshness
         working-directory: dags/dbt/data_warehouse
-        run: dbt build --profiles-dir .
+        run: dbt source freshness --profiles-dir .

@@ -11,3 +11,16 @@ models:
       - name: spread
         data_tests:
           - not_null
+
+unit_tests:
+  - name: cotacao_dolar_calculates_spread_and_daily_variation
+    model: cotacao_dolar
+    given:
+      - input: ref('ptax')
+        rows:
+          - {data_cotacao: "2026-10-01", compra: 5.0000, venda: 5.1000}
+          - {data_cotacao: "2026-10-02", compra: 5.0500, venda: 5.1510}
+    expect:
+      rows:
+        - {data_cotacao: "2026-10-01", spread: 0.1000, variacao_venda_pct: null}
+        - {data_cotacao: "2026-10-02", spread: 0.1010, variacao_venda_pct: 1.0000}

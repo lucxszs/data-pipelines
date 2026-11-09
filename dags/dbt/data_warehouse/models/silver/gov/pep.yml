@@ -10,3 +10,14 @@ models:
       - name: nome_orgao
         data_tests:
           - not_null
+
+unit_tests:
+  - name: pep_cleans_text_and_parses_dates
+    model: pep
+    given:
+      - input: source('bronze', 'gov_pep')
+        rows:
+          - {cpf: "  ", nome_pep: " FULANO ", nome_orgao: " ORGAO A ", data_inicio_exercicio: "01/02/2023", data_fim_exercicio: "Não informada"}
+    expect:
+      rows:
+        - {cpf: null, nome_pep: "FULANO", nome_orgao: "ORGAO A", data_inicio_exercicio: "2023-02-01", data_fim_exercicio: null}

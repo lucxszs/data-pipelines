@@ -11,3 +11,20 @@ models:
       - name: qtd_socios
         data_tests:
           - not_null
+
+unit_tests:
+  - name: empresas_abertas_counts_partners_and_fills_missing_flags
+    model: empresas_abertas
+    given:
+      - input: ref('empresas')
+        rows:
+          - {cnpj: "11111111000191", is_mei: null, is_simples: true}
+          - {cnpj: "22222222000180", is_mei: true, is_simples: null}
+      - input: ref('socios')
+        rows:
+          - {cnpj: "22222222000180", nome_socio: "SOCIO A"}
+          - {cnpj: "22222222000180", nome_socio: "SOCIO B"}
+    expect:
+      rows:
+        - {cnpj: "11111111000191", is_mei: false, is_simples: true, qtd_socios: 0}
+        - {cnpj: "22222222000180", is_mei: true, is_simples: false, qtd_socios: 2}

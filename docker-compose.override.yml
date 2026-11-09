@@ -6,6 +6,7 @@ services:
     restart: on-failure
     environment:
       AIRFLOW_CONN_POSTGRES_DWH: postgres://postgres:postgres@postgres-dwh:5432/dwh
+      AIRFLOW__COSMOS__DBT_DOCS_PROJECTS: '{"data_warehouse":{"dir":"/usr/local/airflow/include/dbt_docs","name":"dbt Docs (nova aba)"}}'
   scheduler:
     restart: on-failure
     environment:

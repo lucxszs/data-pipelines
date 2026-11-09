@@ -17,10 +17,16 @@ class PepLoadJob:
         columns = ", ".join(f"{c} TEXT" for c in constants.BRONZE_COLUMNS)
         execute_query(self.CONN_ID, f"CREATE SCHEMA IF NOT EXISTS {constants.BRONZE_SCHEMA}")
         execute_query(self.CONN_ID, f"CREATE TABLE IF NOT EXISTS {constants.BRONZE_TABLE} ({columns})")
+        execute_query(
+            self.CONN_ID,
+            f"ALTER TABLE {constants.BRONZE_TABLE} "
+            "ADD COLUMN IF NOT EXISTS loaded_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+        )
         execute_query(self.CONN_ID, f"TRUNCATE {constants.BRONZE_TABLE}")
         copy_csv(
             self.CONN_ID,
             constants.BRONZE_TABLE,
+            constants.BRONZE_COLUMNS,
             path,
             delimiter=constants.CSV_DELIMITER,
             encoding=constants.CSV_ENCODING,

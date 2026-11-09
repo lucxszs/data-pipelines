@@ -14,7 +14,8 @@ INSERT INTO bronze.cnpjpw_empresas VALUES
 
 CREATE TABLE bronze.gov_pep (
     cpf TEXT, nome_pep TEXT, sigla_funcao TEXT, descricao_funcao TEXT, nivel_funcao TEXT,
-    nome_orgao TEXT, data_inicio_exercicio TEXT, data_fim_exercicio TEXT, data_fim_carencia TEXT
+    nome_orgao TEXT, data_inicio_exercicio TEXT, data_fim_exercicio TEXT, data_fim_carencia TEXT,
+    loaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 INSERT INTO bronze.gov_pep VALUES
     ('***.111.111-**', 'FULANO DE TAL', 'DAS', 'DIRETOR', '101.5', 'MINISTERIO A', '01/02/2023', 'Não informada', 'Não informada'),

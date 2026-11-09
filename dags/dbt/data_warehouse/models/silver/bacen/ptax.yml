@@ -14,3 +14,37 @@ models:
       - name: venda
         data_tests:
           - not_null
+
+unit_tests:
+  - name: ptax_keeps_last_quote_of_each_day
+    model: ptax
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: source('bronze', 'bacen_ptax')
+        rows:
+          - {data_hora_cotacao: "2026-10-01 10:00:00.000", payload: '{"cotacaoCompra": 5.0000, "cotacaoVenda": 5.1000}'}
+          - {data_hora_cotacao: "2026-10-01 13:00:00.000", payload: '{"cotacaoCompra": 5.2000, "cotacaoVenda": 5.3000}'}
+          - {data_hora_cotacao: "2026-10-02 13:00:00.000", payload: '{"cotacaoCompra": 5.4000, "cotacaoVenda": 5.5000}'}
+    expect:
+      rows:
+        - {data_cotacao: "2026-10-01", compra: 5.2000, venda: 5.3000}
+        - {data_cotacao: "2026-10-02", compra: 5.4000, venda: 5.5000}
+
+  - name: ptax_incremental_reads_only_new_rows
+    model: ptax
+    overrides:
+      macros:
+        is_incremental: true
+    given:
+      - input: source('bronze', 'bacen_ptax')
+        rows:
+          - {data_hora_cotacao: "2026-10-01 13:00:00.000", loaded_at: "2026-10-01 14:00:00+00", payload: '{"cotacaoCompra": 5.0000, "cotacaoVenda": 5.1000}'}
+          - {data_hora_cotacao: "2026-10-02 13:00:00.000", loaded_at: "2026-10-02 14:00:00+00", payload: '{"cotacaoCompra": 5.4000, "cotacaoVenda": 5.5000}'}
+      - input: this
+        rows:
+          - {data_cotacao: "2026-10-01", loaded_at: "2026-10-01 14:00:00+00"}
+    expect:
+      rows:
+        - {data_cotacao: "2026-10-02", compra: 5.4000, venda: 5.5000}

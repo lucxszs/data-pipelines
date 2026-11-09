@@ -12,3 +12,16 @@ models:
       - name: total_vinculos
         data_tests:
           - not_null
+
+unit_tests:
+  - name: pep_orgao_resumo_counts_people_and_active_links
+    model: pep_orgao_resumo
+    given:
+      - input: ref('pep')
+        rows:
+          - {nome_orgao: "ORGAO A", cpf: "111", data_fim_exercicio: null}
+          - {nome_orgao: "ORGAO A", cpf: "111", data_fim_exercicio: "2000-01-01"}
+          - {nome_orgao: "ORGAO A", cpf: "222", data_fim_exercicio: "2999-01-01"}
+    expect:
+      rows:
+        - {nome_orgao: "ORGAO A", total_vinculos: 3, pessoas_distintas: 2, vinculos_ativos: 2}

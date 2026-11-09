@@ -38,14 +38,14 @@ def upsert_json(conn_id: str, table: str, key_column: str, rows: list[tuple[str,
     )
 
 
-def copy_csv(conn_id: str, table: str, filepath: str, delimiter: str, encoding: str) -> None:
+def copy_csv(conn_id: str, table: str, columns: list[str], filepath: str, delimiter: str, encoding: str) -> None:
     """Bulk load a CSV with COPY, streaming raw bytes so Postgres decodes `encoding`.
 
     The hook returns a psycopg 2 or 3 connection depending on SQLAlchemy, and each
     driver has its own COPY API.
     """
     sql = (
-        f"COPY {table} FROM STDIN WITH "
+        f"COPY {table} ({', '.join(columns)}) FROM STDIN WITH "
         f"(FORMAT csv, HEADER true, DELIMITER '{delimiter}', ENCODING '{encoding}')"
     )
     conn = PostgresHook(postgres_conn_id=conn_id).get_conn()
