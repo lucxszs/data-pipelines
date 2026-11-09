@@ -45,7 +45,6 @@ Uma única convenção liga cada fonte do início ao fim:
 - **Cargas idempotentes:** reexecutar uma DAG não duplica dados.
 - **Uma task por modelo:** uma falha é reprocessada sozinha, com log próprio.
 - **Testes como portão:** um teste que falha impede a camada seguinte de rodar.
-- **Sem dados no repositório:** tudo vem das fontes quando as DAGs rodam.
 
 ### Como adicionar uma fonte
 
